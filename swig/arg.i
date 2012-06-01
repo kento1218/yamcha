@@ -1,11 +1,12 @@
 %include typemaps.i
 
 /* java */ 
-%typemap(java,jni)    (int argc, char *argv[]) "jobjectArray" 
-%typemap(java,jtype)  (int argc, char *argv[]) "String[]"
-%typemap(java,jstype) (int argc, char *argv[]) "String[]"
+#if defined(SWIGJAVA)
+%typemap(jni)    (int argc, char *argv[]) "jobjectArray" 
+%typemap(jtype)  (int argc, char *argv[]) "String[]"
+%typemap(jstype) (int argc, char *argv[]) "String[]"
 
-%typemap(java, in) (int argc, char *argv[]) (jstring *jsarray) {
+%typemap(in) (int argc, char *argv[]) (jstring *jsarray) {
   int i;
 
   $1 = JCALL1 (GetArrayLength, jenv, $input);
@@ -24,7 +25,7 @@
 
 %typemap(argout) (int argc, char *argv[]) "" /* override char *[] default */
 
-%typemap(java, freearg) (int argc, char *argv[]) {
+%typemap(freearg) (int argc, char *argv[]) {
   int i;
   for (i = 0; i < $1; i++) {
     JCALL2 (ReleaseStringUTFChars, jenv, jsarray$argnum[i], $2[i]);
@@ -33,7 +34,8 @@
 }
 
 /* perl */
-%typemap(perl5,in) (int argc, char *argv[]) {
+#elif defined(SWIGPERL)
+%typemap(in) (int argc, char *argv[]) {
   AV *tempav;
   SV **tv;
   I32 len;
@@ -56,12 +58,13 @@
   $2[i] = 0;
 }
 
-%typemap(perl5,freearg) (int argc, char *argv[]) {
+%typemap(freearg) (int argc, char *argv[]) {
   delete [] $2;
 }
 
 /* python */ 
-%typemap(python,in) (int argc, char *argv[]) {
+#elif defined(SWIGPYTHON)
+%typemap(in) (int argc, char *argv[]) {
   int i;
   if (!PyList_Check($input)) {
     SWIG_exception(SWIG_ValueError, "Expecting a list");
@@ -84,12 +87,13 @@
   $2[i] = 0;
 }
 
-%typemap(python,freearg) (int argc, char *argv[]) {
+%typemap(freearg) (int argc, char *argv[]) {
   delete [] $2;
 }
 
 /* ruby */
-%typemap(ruby,in) (int argc, char *argv[]) {
+#elif defined(SWIGRUBY)
+%typemap(in) (int argc, char *argv[]) {
   int i;
   
   if (TYPE($input) != T_ARRAY) {
@@ -111,6 +115,8 @@
   $2[i] = 0;
 }
 
-%typemap(ruby,freearg) (int argc, char *argv[]) {
+%typemap(freearg) (int argc, char *argv[]) {
   delete [] $2;
 }
+
+#endif
