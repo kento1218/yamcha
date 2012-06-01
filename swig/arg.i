@@ -95,7 +95,7 @@
   if (TYPE($input) != T_ARRAY) {
     SWIG_exception(SWIG_ValueError, "Expected an array");
   }
-  $1 = RARRAY($input)->len;
+  $1 = RARRAY_LEN($input);
   if ($1 == 0) {
     SWIG_exception(SWIG_ValueError, "List must contain at least 1 element");
   }
@@ -106,7 +106,7 @@
       free($2);
       SWIG_exception(SWIG_ValueError, "List items must be strings");
     }
-    $2[i] = STR2CSTR(s);
+    $2[i] = StringValuePtr(s);
   }
   $2[i] = 0;
 }
