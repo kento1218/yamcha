@@ -24,6 +24,7 @@
 #include <fstream>
 #include <strstream>
 #include <cstdio>
+#include <cstring>
 #include "param.h"
 #include "common.h"
 
